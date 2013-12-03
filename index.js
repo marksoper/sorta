@@ -17,23 +17,24 @@ var Pic = function(props) {
 
 Pic.prototype.rawToPixel = function() {
   this.pixelData = [];
-  for (var i=0; i<this.rawData.length; i+=4) {
+  for (var i=0; i<this.imageData.data.length; i+=4) {
     this.pixelData.push({
-      r: this.rawData[i],
-      g: this.rawData[i+1],
-      b: this.rawData[i+2],
-      a: this.rawData[i+3]
+      i: i/4,
+      r: this.imageData.data[i],
+      g: this.imageData.data[i+1],
+      b: this.imageData.data[i+2],
+      a: this.imageData.data[i+3]
     });
   }
 };
 
 Pic.prototype.pixelToRaw = function() {
-  this.rawData = [];
   var self = this;
   for (var i=0; i<this.pixelData.length; i++) {
-    ["r", "g", "b", "a"].forEach(function(attr) {
-      self.rawData.push(self.pixelData[i][attr]);
-    });
+    self.imageData.data[4*i] = self.pixelData[i]["r"];
+    self.imageData.data[4*i+1] = self.pixelData[i]["g"];
+    self.imageData.data[4*i+2] = self.pixelData[i]["b"];
+    self.imageData.data[4*i+3] = self.pixelData[i]["a"];
   }
 };
 
@@ -47,7 +48,6 @@ Pic.prototype.draw = function() {
 
 Pic.prototype.getImageData = function() {
   this.imageData = this.context.getImageData(0,0,this.canvas.width, this.canvas.height);
-  this.rawData = this.imageData.data;
   return this.imageData;
 };
 
@@ -57,6 +57,7 @@ Pic.prototype.shuffle = function() {
   }
   shuffle(this.pixelData);
   this.pixelToRaw();
+  return this;
 };
 
 
@@ -94,8 +95,9 @@ img.onload = function() {
   //
   shuffled = new Pic({
     canvas: document.getElementById("shuffled"),
-    imageData: original.shuffle()
+    imageData: original.imageData
   });
+  shuffled.shuffle();
   shuffled.draw();
 };
 
