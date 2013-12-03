@@ -60,6 +60,44 @@ Pic.prototype.shuffle = function() {
   return this;
 };
 
+Pic.prototype.badsort = function() {
+  var count=0;
+  var next=0;
+  var length = this.pixelData.length;
+  var place = function(index, arr) {
+    count++;
+    console.log(count);
+    if (next>=length-1) {
+      return;
+    }
+    var item = arr[index];
+    var correctIndex = item["i"];
+    var temp = arr[correctIndex];
+    if (temp === null) {
+      next++;
+      place(next, arr);
+    } else {
+      arr[index] = null;
+      arr[correctIndex] = item;
+      place(temp["i"], arr);
+    }
+  };
+  place(next, this.pixelData);
+  return this;
+};
+
+Pic.prototype.sort = function() {
+  function compare(a,b) {
+    if (a["i"] < b["i"])
+      return -1;
+    if (a["i"] > b["i"])
+      return 1;
+    return 0;
+  }
+  this.pixelData.sort(compare);
+  return this;
+};
+
 
 
 //
@@ -99,6 +137,15 @@ img.onload = function() {
   });
   shuffled.shuffle();
   shuffled.draw();
+  //
+  sorted = new Pic({
+    canvas: document.getElementById("sorted"),
+    imageData: shuffled.imageData
+  });
+  sorted.pixelData = shuffled.pixelData;  // TODO: better here
+  sorted.sort();
+  sorted.pixelToRaw();
+  sorted.draw();
 };
 
 
